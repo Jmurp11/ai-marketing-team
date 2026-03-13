@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "🔍 New Lead Discovered" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Organization:*\n{{organization}}" },
+        { "type": "mrkdwn", "text": "*Contact:*\n{{contact_name}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Teams:*\n{{num_teams}}" },
+        { "type": "mrkdwn", "text": "*Score:*\n{{lead_score}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Signals:* {{engagement_signals}}\n*Recommended Action:* {{action}}" }
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}

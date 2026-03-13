@@ -1,0 +1,33 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "🧪 Experiment Result" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Hypothesis:* {{hypothesis}}" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Channel:*\n{{channel}}" },
+        { "type": "mrkdwn", "text": "*Variable:*\n{{variable}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Control:*\n{{control_result}}" },
+        { "type": "mrkdwn", "text": "*Variant:*\n{{variant_result}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Outcome:* {{outcome}}\n*Recommendation:* {{recommendation}}" }
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}

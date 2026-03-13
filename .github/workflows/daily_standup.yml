@@ -1,0 +1,50 @@
+name: Daily Standup
+
+on:
+  schedule:
+    # 9:00 AM EST = 14:00 UTC (or 13:00 UTC during EDT)
+    - cron: '0 14 * * 1-5'
+  workflow_dispatch:
+
+env:
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  GITHUB_PROJECT_NUMBER: ${{ vars.GITHUB_PROJECT_NUMBER }}
+
+jobs:
+  standup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Run daily standup pipeline
+        run: |
+          echo "=== RinkLink Daily Standup ==="
+          echo "Date: $(date '+%Y-%m-%d')"
+          DATE=$(date '+%Y-%m-%d')
+
+          # Each agent posts their standup
+          # In production, Claude Code generates content for each agent.
+          # This workflow provides the scaffold — agent content is injected at runtime.
+
+          AGENTS=("admin" "assistant" "content" "email" "ads" "social" "growth" "leads")
+          NAMES=("Riley (Admin)" "Casey (Assistant)" "Morgan (Content)" "Drew (Email)" "Jordan (Ads)" "Alex (Social)" "Sam (Growth)" "Taylor (Leads)")
+
+          for i in "${!AGENTS[@]}"; do
+            AGENT="${AGENTS[$i]}"
+            NAME="${NAMES[$i]}"
+            echo "Posting standup for ${NAME}..."
+
+            # Placeholder: In production, Claude generates yesterday/today/blockers
+            ./tools/slack_post.sh "$AGENT" "#rinklink-hq" "" \
+              slack/templates/daily_update.json \
+              "{\"agent_name\":\"${NAME}\",\"date\":\"${DATE}\",\"yesterday\":\"See agent activity log\",\"today\":\"Scheduled tasks for today\",\"blockers\":\"None\"}"
+
+            sleep 2  # Rate limit buffer
+          done
+
+          echo "=== Standup complete ==="

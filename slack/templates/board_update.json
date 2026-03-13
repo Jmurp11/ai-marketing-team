@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "📋 Board Update" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Action:* {{action}}" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Task:*\n{{task_title}}" },
+        { "type": "mrkdwn", "text": "*Agent:*\n{{agent}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Status:*\n{{status}}" },
+        { "type": "mrkdwn", "text": "*Priority:*\n{{priority}}" }
+      ]
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}

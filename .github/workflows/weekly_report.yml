@@ -1,0 +1,72 @@
+name: Weekly Report
+
+on:
+  schedule:
+    # 8:00 AM EST Monday = 13:00 UTC Monday (or 12:00 UTC during EDT)
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+env:
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  GITHUB_PROJECT_NUMBER: ${{ vars.GITHUB_PROJECT_NUMBER }}
+
+jobs:
+  weekly-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Compute week number
+        id: week
+        run: echo "week=$(date '+%Y-W%V')" >> "$GITHUB_OUTPUT"
+
+      - name: Run weekly report pipeline
+        run: |
+          echo "=== RinkLink Weekly Report ==="
+          echo "Week: ${{ steps.week.outputs.week }}"
+          WEEK="${{ steps.week.outputs.week }}"
+
+          # Agent → Channel mapping
+          declare -A CHANNELS
+          CHANNELS[social]="#social-updates"
+          CHANNELS[ads]="#ads-updates"
+          CHANNELS[content]="#content-updates"
+          CHANNELS[email]="#email-updates"
+          CHANNELS[growth]="#experiments"
+          CHANNELS[leads]="#leads"
+          CHANNELS[assistant]="#admin-log"
+          CHANNELS[admin]="#admin-log"
+
+          declare -A NAMES
+          NAMES[admin]="Riley (Admin)"
+          NAMES[assistant]="Casey (Assistant)"
+          NAMES[content]="Morgan (Content)"
+          NAMES[email]="Drew (Email)"
+          NAMES[ads]="Jordan (Ads)"
+          NAMES[social]="Alex (Social)"
+          NAMES[growth]="Sam (Growth)"
+          NAMES[leads]="Taylor (Leads)"
+
+          for AGENT in admin assistant content email ads social growth leads; do
+            NAME="${NAMES[$AGENT]}"
+            CHANNEL="${CHANNELS[$AGENT]}"
+            echo "Posting weekly report for ${NAME} to ${CHANNEL}..."
+
+            # Placeholder: In production, Claude generates metrics/highlights/next_week
+            ./tools/slack_post.sh "$AGENT" "$CHANNEL" "" \
+              slack/templates/weekly_report.json \
+              "{\"agent_name\":\"${NAME}\",\"week\":\"${WEEK}\",\"metrics\":\"See detailed report\",\"highlights\":\"Weekly highlights pending\",\"next_week\":\"Planning in progress\"}"
+
+            sleep 2
+          done
+
+          # Admin executive summary to #rinklink-hq
+          ./tools/slack_post.sh admin "#rinklink-hq" \
+            "📊 Weekly executive summary for ${WEEK} posted. Check individual channels for detailed agent reports."
+
+          echo "=== Weekly report complete ==="

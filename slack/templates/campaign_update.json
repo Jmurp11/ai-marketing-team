@@ -1,0 +1,33 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "📈 Campaign Update" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Campaign:* {{campaign_name}}" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Impressions:*\n{{impressions}}" },
+        { "type": "mrkdwn", "text": "*CTR:*\n{{ctr}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*CPC:*\n{{cpc}}" },
+        { "type": "mrkdwn", "text": "*CPA:*\n{{cpa}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Conversions:* {{conversions}}\n*Status:* {{status}}" }
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}

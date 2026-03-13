@@ -1,0 +1,33 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "✉️ Email Campaign Update" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Campaign:* {{campaign_name}}" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Sent:*\n{{emails_sent}}" },
+        { "type": "mrkdwn", "text": "*Open Rate:*\n{{open_rate}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*CTR:*\n{{ctr}}" },
+        { "type": "mrkdwn", "text": "*Replies:*\n{{replies}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Demo Bookings:* {{demo_bookings}}\n*Notes:* {{notes}}" }
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}
