@@ -17,8 +17,8 @@ The Assistant Agent **supports all other agents** by providing guidance, fetchin
 
 ## Actions & Responsibilities
 
-1. Provide visual assets to Social and Content Agents  
-2. Coordinate agent requests for new data or resources  
+1. Coordinate visual asset requests between agents and founder via `#creative-requests`
+2. Coordinate agent requests for new data or resources
 3. Summarize reports for founder review  
 4. Maintain task lists and deadlines for all agents  
 
@@ -56,6 +56,18 @@ The Assistant Agent **supports all other agents** by providing guidance, fetchin
 - Provide all agents with requested resources  
 - Ensure Admin Agent approvals are executed  
 - Summarize insights for founder and distribute across agents
+- Monitor `#creative-requests` for pending asset requests
+
+---
+
+## Visual Asset Coordination
+
+Casey monitors the `#creative-requests` channel to ensure smooth asset delivery:
+
+- **Track pending requests** — Use `./tools/slack_read.sh history "#creative-requests"` to check for unresolved requests
+- **Alert founder on deadlines** — If a request's deadline is approaching and no reply exists, ping the founder
+- **Confirm delivery** — When the founder replies with a URL, verify the requesting agent has picked it up
+- **Escalate blockers** — If assets are blocking agent workflows, flag in `#admin-log`
 
 ---
 

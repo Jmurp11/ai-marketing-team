@@ -1,0 +1,50 @@
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": { "type": "plain_text", "text": "🎨 Visual Asset Request" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Requested By:*\n{{agent_name}}" },
+        { "type": "mrkdwn", "text": "*Platform:*\n{{platform}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Campaign:*\n{{campaign}}" },
+        { "type": "mrkdwn", "text": "*Urgency:*\n{{urgency}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Creative Brief:*\n{{creative_brief}}" }
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Image Prompt:*\n{{image_prompt}}" }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Dimensions:*\n{{dimensions}}" },
+        { "type": "mrkdwn", "text": "*Format:*\n{{format}}" }
+      ]
+    },
+    {
+      "type": "section",
+      "text": { "type": "mrkdwn", "text": "*Deadline:*\n{{deadline}}" }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": "Reply in this thread with the publicly accessible image URL when ready." }
+      ]
+    }
+  ]
+}

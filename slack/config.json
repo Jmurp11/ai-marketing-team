@@ -59,6 +59,8 @@
     "email-updates": { "purpose": "Email campaign performance, sequence updates, open/click rates" },
     "experiments": { "purpose": "Experiment proposals and results" },
     "leads": { "purpose": "New leads, scores, routing decisions" },
-    "admin-log": { "purpose": "System health, board updates, weekly summaries" }
+    "admin-log": { "purpose": "System health, board updates, weekly summaries" },
+    "creative-requests": { "purpose": "Visual asset requests from agents, founder replies with assets" },
+    "content-review": { "purpose": "Escalated content requiring founder approval before publishing — policy flagged items" }
   }
 }

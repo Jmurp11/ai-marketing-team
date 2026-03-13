@@ -69,6 +69,7 @@ Posts messages to Slack as any RinkLink agent with custom display name and avata
 | Campaign Update | `slack/templates/campaign_update.json` | Ads performance |
 | Email Update | `slack/templates/email_update.json` | Email campaign metrics |
 | Board Update | `slack/templates/board_update.json` | GitHub board changes |
+| Asset Request | `slack/templates/asset_request.json` | Visual asset requests |
 
 ### Channels
 
@@ -82,3 +83,4 @@ Posts messages to Slack as any RinkLink agent with custom display name and avata
 | `#experiments` | Experiment proposals and results |
 | `#leads` | New leads, scores, routing |
 | `#admin-log` | System health, board updates |
+| `#creative-requests` | Visual asset requests and delivery |

@@ -117,10 +117,12 @@ Agents should execute **all of the following aggressively**:
 
 # Aggressive Growth Guidelines
 
-- Engage with 50+ posts per day  
-- Follow hundreds of accounts per week  
-- Reply quickly to trending topics or relevant discussions  
-- Maintain consistent daily posting schedule  
+- Engage with 50+ posts per day
+- Follow hundreds of accounts per week
+- Reply quickly to trending topics or relevant discussions
+- Maintain consistent daily posting schedule
+
+**Content Policy Override:** Volume and engagement targets must **never** override the content policy. All posts and replies — regardless of volume goals — must pass the Pre-Publish Checklist in `knowledge/content_policy.md`. Do not sacrifice professionalism, youth safety, or brand reputation for engagement metrics. If meeting volume targets would require posting content that violates policy, reduce volume instead.
 
 ---
 

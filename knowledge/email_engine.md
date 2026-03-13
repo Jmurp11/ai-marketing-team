@@ -211,3 +211,55 @@ Email performance data should be shared with:
 • Lead Discovery Agent  
 
 This enables continuous optimization of messaging and targeting.
+
+---
+
+# Email Infrastructure
+
+## SMTP Configuration
+
+Emails are sent via Protonmail SMTP:
+- Host: `smtp.protonmail.ch`
+- Port: 587
+- Secure: false (STARTTLS)
+- Sender: `jim@rinklink.ai`
+
+## Sending Tool
+
+Use `tools/email_send.sh` to send emails. The tool:
+1. Renders template variables (`{{name}}`, `{{email}}`, `{{organization_name}}`, `{{association}}`)
+2. Wraps content in the branded RinkLink HTML template
+3. Sends via SMTP
+4. Logs the send to the Supabase `emails` table
+
+## Brand Template
+
+All emails use the unified RinkLink template:
+- **Header:** Dark blue (#0c4066) bar with "RinkLink.ai" logo text
+- **Body:** White card with Space Grotesk font, 16px, 1.6 line height
+- **Buttons:** Orange (#f0622b) primary CTAs, outline variant available
+- **Footer:** Copyright text in gray
+- **Responsive:** Mobile-optimized with 600px max-width
+
+## Cold vs Branded Emails
+
+Cold outreach and first-contact emails to unknown recipients **must** use the `--cold` flag. This sends plain text only — no HTML template, no branding — which avoids spam filters that flag heavy HTML from unknown senders.
+
+The branded HTML template (header bar, styled container, web fonts) should only be used for:
+- Newsletters to opted-in contacts
+- Nurture sequences to known leads
+- Campaign emails to existing subscribers
+
+## Rate Limits
+
+- 1 second delay between individual sends
+- Batch size: 50 emails per batch
+- Daily limit: 500 emails
+
+## Template Variables
+
+Available in subject and body:
+- `{{name}}` — recipient name (defaults to "there")
+- `{{email}}` — recipient email address
+- `{{organization_name}}` — their organization
+- `{{association}}` — their association/league

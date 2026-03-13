@@ -1,0 +1,13 @@
+{
+  "name": "rinklink-slack-bot",
+  "version": "1.0.0",
+  "description": "Slack bot that routes messages to Claude Code agents",
+  "main": "slack_bot.js",
+  "scripts": {
+    "start": "node slack_bot.js"
+  },
+  "dependencies": {
+    "@slack/bolt": "^4.1.0",
+    "dotenv": "^16.4.0"
+  }
+}
