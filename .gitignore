@@ -1,5 +1,8 @@
 # Environment variables (contains secrets)
 .env
 
+# Google service account key (contains secrets)
+google-service-account.json
+
 # OS files
 .DS_Store

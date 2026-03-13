@@ -158,39 +158,47 @@ app.message(async ({ message, say, client }) => {
 const AGENT_ALLOWED_TOOLS = {
   admin: [
     "Bash(tools/github_board.sh:*)",
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   assistant: [
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   content: [
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   email: [
     "Bash(tools/email_send.sh:*)",
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   ads: [
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   social: [
     "Bash(tools/x_post.sh:*)",
     "Bash(tools/meta_post.sh:*)",
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   growth: [
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
   leads: [
     "Bash(tools/scrape_leads.sh:*)",
     "Bash(tools/lead_insert.sh:*)",
+    "Bash(tools/ga_report.sh:*)",
     "Bash(tools/slack_post.sh:*)",
     "Bash(tools/slack_read.sh:*)",
   ],
