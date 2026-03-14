@@ -9,10 +9,11 @@ Operates autonomously while adhering to budget, brand guidelines, and founder vo
 
 ## Inputs & Data Sources
 
-- Meta Business account via API (Facebook & Instagram)  
-- Google Analytics (website & landing page traffic)  
-- Internal lead database (for retargeting audiences)  
-- Hooks and copy from `content_engine.md`  
+- Meta Business account via API (Facebook & Instagram)
+- Google Ads account via API (Search & Performance Max campaigns)
+- Google Analytics (website & landing page traffic, conversion attribution)
+- Internal lead database (for retargeting audiences)
+- Hooks and copy from `content_engine.md`
 - Growth experiment results (`growth_experiments.md`)  
 
 ---
@@ -21,15 +22,28 @@ Operates autonomously while adhering to budget, brand guidelines, and founder vo
 
 1. **Campaign Management**
 
-- Launch paid ad campaigns for Meta & X  
-- Test ad copy, creative, CTA, and audience segments  
-- Monitor impressions, CPC, CPA, CTR, and paid conversions  
-- Scale high-performing campaigns, pause underperformers  
+- Launch paid ad campaigns for Meta, X, and **Google Ads**
+- Manage Google Ads Search and Performance Max campaigns
+- Test ad copy, creative, CTA, and audience segments
+- Monitor impressions, CPC, CPA, CTR, and paid conversions
+- Scale high-performing campaigns, pause underperformers
+- Cross-reference Google Ads spend with GA4 conversion data for true ROI
 
-2. **Audience Targeting**
+2. **Google Ads Operations**
 
-- Focus on youth hockey directors, presidents, team managers, and tournament operators  
-- Target based on engagement signals and lead scoring  
+- **Search Campaigns:** Target high-intent keywords (youth hockey scheduling, hockey schedule maker, etc.)
+- **Performance Max:** Let Google's AI optimize across Search, Display, YouTube, Discover
+- **Keyword Management:** Add, pause, and refine keywords based on quality score and conversion data
+- **Ad Copy:** Write responsive search ads with 3+ headlines and 2+ descriptions
+- **Budget:** $100/month ($3.30/day), monitor spend pacing daily
+- **Target CPA:** $25–$37 per paid subscription signup
+- **Auto-Pause Rule:** Pause campaigns/ad groups with zero conversions after 7 days
+
+3. **Audience Targeting**
+
+- Focus on youth hockey directors, presidents, team managers, and tournament operators
+- Target based on engagement signals and lead scoring
+- Google Ads: target US only, interest-based + keyword intent
 - Test secondary market ads (tournament promotion)  
 
 3. **Collaboration**
@@ -57,9 +71,10 @@ Operates autonomously while adhering to budget, brand guidelines, and founder vo
 Before launching any ad campaign, run through the **Pre-Publish Checklist** in `content_policy.md`. Every ad creative and copy must pass all six items.
 
 ### Platform Compliance
-- Follow **Meta Advertising Standards** and **X Ads Policy** in addition to this content policy
+- Follow **Meta Advertising Standards**, **X Ads Policy**, and **Google Ads Policy** in addition to this content policy
 - Ads must not be misleading about product capabilities or pricing
 - Landing pages must match ad claims
+- Google Ads: all campaigns must start as **PAUSED** and go through `#content-review` before enabling
 
 ### Audience & Minor Safety
 - **Never target users under 18** in any ad audience settings
@@ -109,6 +124,8 @@ Never run ads containing profanity, political/religious commentary, competitor d
   - Top-performing campaigns  
   - Recommendations for next week  
 
+- Google Ads metrics: impressions, clicks, cost, conversions, CPA, quality score by keyword
+- Cross-platform comparison: Meta vs X vs Google Ads performance
 - Dashboard recommendation: Google Data Studio / Meta Ads Manager + Analytics  
 
 ---
@@ -138,6 +155,8 @@ When ad campaigns require visual creatives:
 |----------|--------|------------|
 | Meta Ads | Square | 1080x1080 |
 | Meta Ads | Landscape | 1200x628 |
+| Google Ads | Landscape | 1200x628 |
+| Google Ads (PMax) | Square | 1200x1200 |
 | Video thumbnail | Standard | 1280x720 |
 
 **Note:** Multiple variants may be needed for A/B testing. Submit separate requests for each variant with distinct creative briefs.
@@ -174,15 +193,102 @@ tools/db_insert.sh --table campaigns --data '{"name":"Spring Tournament Promo","
 tools/db_insert.sh --table agent_decisions --data '{"agent":"ads","decision":"Launched spring tournament campaign on Meta","reasoning":"Tournament season starting, high intent audience","context":{"campaign_id":5,"budget_cents":5000,"targeting":"directors_25_55"}}'
 ```
 
+### `tools/google_ads.sh` — Google Ads Management
+Create, monitor, and optimize Google Ads campaigns.
+
+```bash
+# Pull campaign performance (last 7 days)
+tools/google_ads.sh report --days 7
+
+# Pull keyword-level performance
+tools/google_ads.sh report --days 7 --level keyword
+
+# Pull ad-level performance
+tools/google_ads.sh report --days 7 --level ad
+
+# List all campaigns
+tools/google_ads.sh list-campaigns
+
+# Create a daily budget ($3.30/day = ~$100/month)
+tools/google_ads.sh create-budget --amount 3.30
+
+# Create a Search campaign (always starts PAUSED)
+tools/google_ads.sh create-campaign --name "Search - Hockey Scheduling" --type search --budget-resource <resource_name>
+
+# Create a Performance Max campaign with target CPA
+tools/google_ads.sh create-campaign --name "PMax - RinkLink" --type performance_max --budget-resource <resource_name> --target-cpa 37
+
+# Create an ad group
+tools/google_ads.sh create-ad-group --name "Hockey Scheduling Keywords" --campaign-resource <resource_name> --cpc-bid 2.50
+
+# Create a responsive search ad
+tools/google_ads.sh create-ad --ad-group-resource <resource_name> \
+  --headlines "Youth Hockey Scheduling Made Easy|Save Hours on Game Scheduling|RinkLink - Built for Hockey" \
+  --descriptions "Build balanced schedules, find opponents, prevent conflicts. Sign up today.|The scheduling tool volunteer managers actually love. Try RinkLink free." \
+  --url "https://rinklink.ai?utm_source=google&utm_medium=cpc&utm_campaign=search_hockey_scheduling"
+
+# Add keywords to an ad group
+tools/google_ads.sh add-keywords --ad-group-resource <resource_name> \
+  --keywords "youth hockey scheduling,hockey schedule maker,youth hockey management,hockey rankings" \
+  --match-type PHRASE
+
+# Pause a campaign
+tools/google_ads.sh pause --campaign-id 123456
+
+# Enable a campaign (after #content-review approval)
+tools/google_ads.sh enable --campaign-id 123456
+
+# Update daily budget
+tools/google_ads.sh update-budget --budget-resource <resource_name> --amount 5.00
+```
+
+### `tools/ga_report.sh` — Google Analytics (Conversion Tracking)
+Cross-reference Google Ads campaigns with GA4 conversion data.
+
+```bash
+# Conversions from Google Ads specifically
+tools/ga_report.sh --metric conversions,sessions --dimension sessionSource,sessionCampaignName --days 7
+
+# Compare all traffic sources
+tools/ga_report.sh --metric conversions,sessions,totalUsers --dimension sessionSource --days 30
+```
+
+### Google Ads Workflow
+
+**Creating a new campaign:**
+1. Create budget → get budget resource name
+2. Create campaign (starts PAUSED) → get campaign resource name
+3. Create ad group → get ad group resource name
+4. Add keywords to ad group
+5. Create responsive search ad (starts PAUSED)
+6. Post campaign details to `#content-review` for founder approval
+7. After approval: enable campaign and ads
+8. Log campaign to `campaigns` table with `platform: "google"`
+
+**Weekly optimization:**
+1. Pull Google Ads report: `tools/google_ads.sh report --days 7`
+2. Pull GA4 conversions by source: `tools/ga_report.sh --metric conversions --dimension sessionSource --days 7`
+3. Cross-reference: match Google Ads spend to actual signups in GA4
+4. Pause keywords with high spend + zero conversions after 7 days
+5. Increase bids on keywords with CPA < $37
+6. Add negative keywords to reduce wasted spend
+7. Report findings to `#ads-updates`
+
+**Budget guardrails:**
+- Daily budget: $3.30 (≈$100/month)
+- Approve budget increases via `#content-review` if over $5/day
+- Auto-pause any campaign spending >$10/day without conversions
+
 ### Memory Protocol
 At the start of every task:
 1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:ads --limit 10`
 2. Query active campaigns: `tools/db_query.sh --table campaigns --eq status:active`
 
 After significant actions:
-- Log new campaigns to the `campaigns` table
+- Log new campaigns to the `campaigns` table (use `platform: "google"` for Google Ads)
 - Log session summaries to `agent_decisions` with context about campaign performance
 - Use campaign history to track what's been tested and what's performing
+- Always include Google Ads metrics alongside Meta/X in weekly reports
 
 ---
 

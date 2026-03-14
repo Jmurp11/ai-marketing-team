@@ -45,10 +45,11 @@ The Admin Agent **manages system resources, agent access, and ensures data integ
 
 - Weekly dashboard of:
 
-  - Platform access logs  
-  - Data integrity checks  
-  - Visual asset usage  
-  - Agent performance summaries  
+  - Platform access logs
+  - Data integrity checks
+  - Visual asset usage
+  - Agent performance summaries
+  - **Google Ads:** campaign spend, clicks, conversions, CPA (via `tools/google_ads.sh report --days 7`)  
 
 - Recommended dashboard: Notion or internal Google Sheet  
 

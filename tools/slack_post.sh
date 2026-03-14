@@ -50,6 +50,11 @@ if [ -n "$TEMPLATE_FILE" ] && [ -f "$TEMPLATE_FILE" ]; then
   # Replace any remaining template vars with "N/A"
   BLOCKS=$(echo "$BLOCKS" | sed 's|{{[a-z_]*}}|N/A|g')
 
+  # Extract just the blocks array if the template is a full object with a "blocks" key
+  if echo "$BLOCKS" | jq -e '.blocks' &>/dev/null; then
+    BLOCKS=$(echo "$BLOCKS" | jq -c '.blocks')
+  fi
+
   PAYLOAD=$(jq -n \
     --arg channel "$CHANNEL" \
     --arg username "$DISPLAY_NAME" \

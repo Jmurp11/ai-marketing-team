@@ -47,7 +47,14 @@
       "agent": "admin",
       "cron": "0 8 * * 1",
       "channel": "rinklink-hq",
-      "prompt": "Weekly cross-agent report. Compile metrics from all tables: tools/db_query.sh --table social_posts --gte posted_at:LAST_WEEK --count. tools/db_query.sh --table emails --gte created_at:LAST_WEEK --count. tools/db_query.sh --table leads --gte created_at:LAST_WEEK --count. tools/db_query.sh --table experiments --eq status:running. tools/db_query.sh --table agent_decisions --gte created_at:LAST_WEEK --limit 30. Also run tools/ga_report.sh --metric sessions,totalUsers,screenPageViews --days 7. Compile a concise weekly summary: posts made, emails sent, leads discovered, experiments status, website traffic. Post the report to this channel using the weekly_report.json template via slack_post.sh."
+      "prompt": "Weekly cross-agent report. Compile metrics from all tables: tools/db_query.sh --table social_posts --gte posted_at:LAST_WEEK --count. tools/db_query.sh --table emails --gte created_at:LAST_WEEK --count. tools/db_query.sh --table leads --gte created_at:LAST_WEEK --count. tools/db_query.sh --table experiments --eq status:running. tools/db_query.sh --table agent_decisions --gte created_at:LAST_WEEK --limit 30. Also run tools/ga_report.sh --metric sessions,totalUsers,screenPageViews --days 7. Also run tools/ga_report.sh --metric conversions,sessions --dimension sessionSource --days 7 for conversion attribution. Also run tools/google_ads.sh report --days 7 for Google Ads campaign performance. Compile a concise weekly summary: posts made, emails sent, leads discovered, experiments status, website traffic, Google Ads spend/clicks/conversions/CPA, and cross-platform ad performance comparison (Meta vs X vs Google). Post the report to this channel using the weekly_report.json template via slack_post.sh."
+    },
+    {
+      "name": "Google Ads Performance Check",
+      "agent": "ads",
+      "cron": "0 9 * * 1,4",
+      "channel": "ads-updates",
+      "prompt": "Google Ads performance check. First, check recent decisions: tools/db_query.sh --table agent_decisions --eq agent:ads --limit 5. Then pull Google Ads performance: tools/google_ads.sh report --days 7. Pull keyword-level data: tools/google_ads.sh report --days 7 --level keyword. Cross-reference with GA4 conversions: tools/ga_report.sh --metric conversions,sessions --dimension sessionSource,sessionCampaignName --days 7. Analyze: (1) Calculate true CPA = Google spend / GA4 conversions from google/cpc. (2) Identify keywords with spend > $20 and zero conversions — pause them. (3) Identify keywords with CPA < $25 — consider increasing bids. (4) Check daily spend pacing vs $3.30/day budget. Log your analysis to agent_decisions. Report findings to this channel with recommendations."
     }
   ]
 }

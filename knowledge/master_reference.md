@@ -41,10 +41,12 @@ Agents should use this file to **navigate to detailed instructions** across busi
 **File:** [ads_playbook.md](./ads_playbook.md)
 **Purpose:** Paid agent operations:
 
-- Paid campaign setup & optimization (Meta & X)
+- Paid campaign setup & optimization (Meta, X, & **Google Ads**)
+- Google Ads Search & Performance Max campaign strategy
+- Keyword groups, negative keywords, responsive search ads
 - Audience targeting, creative, and messaging
-- Budget management, KPI tracking
-- Conversion-focused campaign management
+- Budget management ($100/month Google Ads, $3.30/day), target CPA $25–$37
+- Conversion-focused campaign management with GA4 cross-referencing
 
 ---
 
