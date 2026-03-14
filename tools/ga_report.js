@@ -54,16 +54,23 @@ async function main() {
     process.exit(1);
   }
 
-  const keyFilePath = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  if (!keyFilePath) {
+  const serviceAccountValue = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!serviceAccountValue) {
     console.error(JSON.stringify({ success: false, error: 'GOOGLE_SERVICE_ACCOUNT_JSON not set in .env' }));
     process.exit(1);
   }
 
-  // Resolve key file path relative to project root
-  const resolvedKeyPath = path.isAbsolute(keyFilePath)
-    ? keyFilePath
-    : path.resolve(process.cwd(), keyFilePath);
+  // Support both inline JSON and file path
+  let clientOptions;
+  const trimmed = serviceAccountValue.trim();
+  if (trimmed.startsWith('{')) {
+    clientOptions = { credentials: JSON.parse(trimmed) };
+  } else {
+    const resolvedKeyPath = path.isAbsolute(trimmed)
+      ? trimmed
+      : path.resolve(process.cwd(), trimmed);
+    clientOptions = { keyFilename: resolvedKeyPath };
+  }
 
   const days = parseInt(args.days || '7', 10);
   const limit = parseInt(args.limit || '20', 10);
@@ -77,9 +84,7 @@ async function main() {
   startDate.setDate(endDate.getDate() - days);
 
   // Initialize client with service account credentials
-  const client = new BetaAnalyticsDataClient({
-    keyFilename: resolvedKeyPath,
-  });
+  const client = new BetaAnalyticsDataClient(clientOptions);
 
   // Build report request
   const request = {
