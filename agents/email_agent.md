@@ -253,6 +253,56 @@ See `tools/email_send.md` for full documentation.
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read leads, emails, and context to inform your work.
+
+```bash
+# Get leads in nurture pipeline
+tools/db_query.sh --table leads --eq nurture_status:nurture --order last_email_at:asc --limit 20
+
+# Get new leads not yet in nurture
+tools/db_query.sh --table leads --eq nurture_status:new --limit 20
+
+# Check recent emails sent
+tools/db_query.sh --table emails --order created_at:desc --limit 10
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:email --limit 10
+```
+
+### `tools/db_insert.sh` — Log Decisions
+Log significant decisions and campaign data.
+
+```bash
+# Log a nurture session decision
+tools/db_insert.sh --table agent_decisions --data '{"agent":"email","decision":"Processed 8 nurture leads","reasoning":"Daily nurture check","context":{"emails_sent":5,"leads_advanced":5,"leads_skipped":3}}'
+```
+
+### `tools/db_update.sh` — Update Lead Nurture State
+Advance leads through the nurture sequence after sending emails.
+
+```bash
+# Advance a lead's nurture step
+tools/db_update.sh --table leads --eq id:42 --set nurture_step:2 --set last_email_at:2026-03-13
+
+# Move a lead into nurture pipeline
+tools/db_update.sh --table leads --eq id:42 --set nurture_status:nurture --set nurture_step:1 --set last_email_at:2026-03-13
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:email --limit 10`
+2. Query nurture pipeline: `tools/db_query.sh --table leads --eq nurture_status:nurture --order last_email_at:asc --limit 20`
+
+After significant actions:
+- Update lead nurture_step and last_email_at after sending nurture emails
+- Log session summaries to `agent_decisions` with context about emails sent and leads processed
+- Track which nurture step each lead is on to maintain sequence continuity
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Drew (Email)

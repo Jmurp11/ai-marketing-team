@@ -15,8 +15,16 @@ CREATE TABLE IF NOT EXISTS leads (
     organization_name TEXT,
     organization_url TEXT,
     source_url TEXT,
+    nurture_status TEXT DEFAULT 'new',
+    nurture_step INT DEFAULT 0,
+    last_email_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Migration: add nurture columns if table already exists
+-- ALTER TABLE leads ADD COLUMN IF NOT EXISTS nurture_status TEXT DEFAULT 'new';
+-- ALTER TABLE leads ADD COLUMN IF NOT EXISTS nurture_step INT DEFAULT 0;
+-- ALTER TABLE leads ADD COLUMN IF NOT EXISTS last_email_at TIMESTAMP;
 
 -- Emails table (used by email_send.js)
 CREATE TABLE IF NOT EXISTS emails (

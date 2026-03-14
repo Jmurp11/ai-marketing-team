@@ -157,6 +157,76 @@ Then ask for feedback or confirmation.
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read from any table to check history and context before acting.
+
+```bash
+# Check what you've posted today
+tools/db_query.sh --table social_posts --gte posted_at:2026-03-13 --limit 20
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:social --limit 10
+
+# Check for running experiments you should be aware of
+tools/db_query.sh --table experiments --eq status:running
+```
+
+### `tools/db_insert.sh` — Log Posts & Decisions
+Log every post and significant decision to the database.
+
+```bash
+# Log a social post
+tools/db_insert.sh --table social_posts --data '{"platform":"x","action":"tweet","content":"Your post text here","platform_post_id":"123456789"}'
+
+# Log a decision
+tools/db_insert.sh --table agent_decisions --data '{"agent":"social","decision":"Posted 3 morning tweets","reasoning":"Morning schedule, varied hooks","context":{"hooks_used":["pain_point","social_proof","founder_story"],"platforms":["x","facebook"]}}'
+```
+
+### `tools/x_read.sh` — Read X/Twitter Analytics
+Check how your tweets are performing.
+
+```bash
+# Get metrics for a specific tweet
+tools/x_read.sh metrics 1234567890
+
+# Get recent tweets with engagement metrics
+tools/x_read.sh recent 10
+```
+
+### `tools/meta_read.sh` — Read Facebook/Instagram Analytics
+Check how your Meta posts are performing.
+
+```bash
+# Facebook page insights
+tools/meta_read.sh page_insights week
+
+# Per-post metrics
+tools/meta_read.sh post_insights 123456789_987654321
+
+# Recent Facebook posts with engagement
+tools/meta_read.sh recent_posts 10
+
+# Instagram account insights
+tools/meta_read.sh ig_insights day
+
+# Recent Instagram posts
+tools/meta_read.sh ig_recent 10
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:social --limit 10`
+2. Query today's posts: `tools/db_query.sh --table social_posts --gte posted_at:TODAY`
+
+After significant actions:
+- Log every post to `social_posts` with platform, action, content, and platform_post_id
+- Log session summaries to `agent_decisions` with context about hooks used and performance
+- Before posting, check `social_posts` to avoid duplicate content
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Alex (Social)

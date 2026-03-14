@@ -104,6 +104,59 @@ Never run experiments that use profanity, political/religious commentary, compet
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read experiments, social posts, and context to measure and plan.
+
+```bash
+# Check running experiments
+tools/db_query.sh --table experiments --eq status:running
+
+# Check completed experiments
+tools/db_query.sh --table experiments --eq status:completed --limit 10
+
+# Review social post performance for experiment analysis
+tools/db_query.sh --table social_posts --gte posted_at:2026-03-01 --limit 30
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:growth --limit 10
+```
+
+### `tools/db_insert.sh` — Create Experiments & Log Decisions
+Log new experiments and significant decisions.
+
+```bash
+# Create a new experiment
+tools/db_insert.sh --table experiments --data '{"name":"hook_test_morning_vs_evening","hypothesis":"Morning posts get 20% more engagement","channel":"social","variable_tested":"post_timing","variants":{"a":"8am post","b":"6pm post"},"kpi":"engagement_rate","status":"planned"}'
+
+# Log a decision
+tools/db_insert.sh --table agent_decisions --data '{"agent":"growth","decision":"Completed hook_test_3, started subject_line_test_4","reasoning":"Weekly experiment review","context":{"completed":1,"started":1,"current_experiments":["subject_line_test_4"]}}'
+```
+
+### `tools/db_update.sh` — Update Experiment Status
+Mark experiments as running, completed, or cancelled with outcomes.
+
+```bash
+# Start an experiment
+tools/db_update.sh --table experiments --eq id:5 --set status:running --set started_at:2026-03-13
+
+# Complete with outcome
+tools/db_update.sh --table experiments --eq id:5 --set status:completed --set outcome:"Variant A won with 15% higher CTR" --set completed_at:2026-03-13
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:growth --limit 10`
+2. Query running experiments: `tools/db_query.sh --table experiments --eq status:running`
+
+After significant actions:
+- Log experiment creation, status changes, and outcomes to the database
+- Log session summaries to `agent_decisions` with context about current experiments
+- Use experiment history to avoid re-testing things that already have clear outcomes
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Sam (Growth)

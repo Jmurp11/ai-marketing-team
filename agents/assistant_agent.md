@@ -71,6 +71,31 @@ Casey monitors the `#creative-requests` channel to ensure smooth asset delivery:
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read any table to support other agents and answer questions.
+
+```bash
+# Check recent social posts
+tools/db_query.sh --table social_posts --order posted_at:desc --limit 10
+
+# Check lead pipeline
+tools/db_query.sh --table leads --count
+
+# Check running experiments
+tools/db_query.sh --table experiments --eq status:running
+
+# Review recent agent decisions across the team
+tools/db_query.sh --table agent_decisions --order created_at:desc --limit 20
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query recent team decisions if context would help: `tools/db_query.sh --table agent_decisions --order created_at:desc --limit 10`
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Casey (Assistant)

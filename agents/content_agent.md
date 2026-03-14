@@ -116,6 +116,28 @@ When blog posts or emails require visual assets (headers, banners, inline images
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read social posts, experiments, and context to inform content creation.
+
+```bash
+# Check recent social posts to align content
+tools/db_query.sh --table social_posts --order posted_at:desc --limit 10
+
+# Check running experiments for content themes
+tools/db_query.sh --table experiments --eq status:running
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:content --limit 10
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:content --limit 10`
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Morgan (Content)

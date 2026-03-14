@@ -1,0 +1,53 @@
+{
+  "schedules": [
+    {
+      "name": "Morning Social Posts",
+      "agent": "social",
+      "cron": "0 8 * * *",
+      "channel": "social-updates",
+      "prompt": "It's time for your morning posting session. First, query your recent decisions: tools/db_query.sh --table agent_decisions --eq agent:social --limit 5. Then check what you've already posted today: tools/db_query.sh --table social_posts --gte posted_at:TODAY. Post 3 items to X and Facebook using hooks from content_engine.md — vary the hooks and platforms. After each post, log it: tools/db_insert.sh --table social_posts --data '{...}'. Log your session summary to agent_decisions. Report what you posted to this channel."
+    },
+    {
+      "name": "Midday Social Posts",
+      "agent": "social",
+      "cron": "0 12 * * *",
+      "channel": "social-updates",
+      "prompt": "Midday posting session. Check what you've posted today: tools/db_query.sh --table social_posts --gte posted_at:TODAY. Post 2-3 items across X, Facebook, and Instagram — avoid repeating hooks or platforms from this morning. Log each post to social_posts and summarize in agent_decisions. Report what you posted."
+    },
+    {
+      "name": "Evening Social Posts",
+      "agent": "social",
+      "cron": "0 17 * * *",
+      "channel": "social-updates",
+      "prompt": "Evening posting session. Check today's posts: tools/db_query.sh --table social_posts --gte posted_at:TODAY. Post 2-3 items — focus on engagement-optimized content and any platforms underrepresented today. Log each post to social_posts and summarize in agent_decisions. Report what you posted."
+    },
+    {
+      "name": "Nurture Email Check",
+      "agent": "email",
+      "cron": "0 10 * * 1-5",
+      "channel": "email-updates",
+      "prompt": "Daily nurture check. Query leads in nurture pipeline: tools/db_query.sh --table leads --eq nurture_status:nurture --order last_email_at:asc --limit 20. For leads whose last_email_at is more than 2 days ago, advance their nurture_step and send the next email in the sequence from email_engine.md. After sending, update the lead: tools/db_update.sh --table leads --eq id:<id> --set nurture_step:<next> --set last_email_at:<now>. Log your session to agent_decisions. Report how many leads you processed and emails sent."
+    },
+    {
+      "name": "Lead Discovery",
+      "agent": "leads",
+      "cron": "0 6 * * 1,4",
+      "channel": "leads",
+      "prompt": "Scheduled lead discovery run. First check recent decisions: tools/db_query.sh --table agent_decisions --eq agent:leads --limit 5. Run tools/scrape_leads.sh --max-pages 3 to discover new contacts. Evaluate each contact using the Lead Discovery Workflow — validate name, role, organization, and email quality. Insert validated leads with tools/lead_insert.sh. Log your discovery session to agent_decisions with context including associations scraped and validation stats. Report your results: scraped count, validated count, rejected reasons."
+    },
+    {
+      "name": "Weekly Growth Experiment Review",
+      "agent": "growth",
+      "cron": "0 9 * * 1",
+      "channel": "experiments",
+      "prompt": "Weekly experiment review. Query running experiments: tools/db_query.sh --table experiments --eq status:running. Query recent social post performance: tools/db_query.sh --table social_posts --limit 20. Review each running experiment — if enough data, mark completed with outcome: tools/db_update.sh --table experiments --eq id:<id> --set status:completed --set outcome:<result>. Then propose 1-2 new experiments and log them: tools/db_insert.sh --table experiments --data '{...}'. Log your review to agent_decisions. Report findings and next experiments."
+    },
+    {
+      "name": "Weekly Admin Report",
+      "agent": "admin",
+      "cron": "0 8 * * 1",
+      "channel": "rinklink-hq",
+      "prompt": "Weekly cross-agent report. Compile metrics from all tables: tools/db_query.sh --table social_posts --gte posted_at:LAST_WEEK --count. tools/db_query.sh --table emails --gte created_at:LAST_WEEK --count. tools/db_query.sh --table leads --gte created_at:LAST_WEEK --count. tools/db_query.sh --table experiments --eq status:running. tools/db_query.sh --table agent_decisions --gte created_at:LAST_WEEK --limit 30. Also run tools/ga_report.sh --metric sessions,totalUsers,screenPageViews --days 7. Compile a concise weekly summary: posts made, emails sent, leads discovered, experiments status, website traffic. Post the report to this channel using the weekly_report.json template via slack_post.sh."
+    }
+  ]
+}

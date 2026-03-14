@@ -154,6 +154,44 @@ See `tools/scrape_leads.md` and `tools/lead_insert.md` for full documentation.
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Check existing leads and context before discovering new ones.
+
+```bash
+# Check existing leads count
+tools/db_query.sh --table leads --count
+
+# Check leads from a specific association
+tools/db_query.sh --table leads --eq association:"Metro Hockey" --limit 20
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:leads --limit 10
+
+# Check recent lead discoveries
+tools/db_query.sh --table leads --order created_at:desc --limit 10
+```
+
+### `tools/db_insert.sh` — Log Decisions
+Log discovery sessions and significant decisions.
+
+```bash
+# Log a discovery session
+tools/db_insert.sh --table agent_decisions --data '{"agent":"leads","decision":"Scraped 3 associations, inserted 12 validated leads","reasoning":"Scheduled discovery run","context":{"associations_scraped":["Minnesota","Michigan","Ohio"],"contacts_found":45,"validated":12,"rejected":33}}'
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:leads --limit 10`
+2. Check recent leads for pipeline awareness: `tools/db_query.sh --table leads --order created_at:desc --limit 10`
+
+After significant actions:
+- Log discovery session summaries to `agent_decisions` with context about associations scraped and validation stats
+- Use existing lead data to understand which associations have been covered already
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Taylor (Leads)

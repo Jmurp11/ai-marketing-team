@@ -144,6 +144,48 @@ When ad campaigns require visual creatives:
 
 ---
 
+## Database Tools
+
+### `tools/db_query.sh` — Query Database
+Read campaigns, experiments, and context to inform ad decisions.
+
+```bash
+# Check active campaigns
+tools/db_query.sh --table campaigns --eq status:active
+
+# Check all campaigns
+tools/db_query.sh --table campaigns --order created_at:desc --limit 10
+
+# Review your recent decisions
+tools/db_query.sh --table agent_decisions --eq agent:ads --limit 10
+
+# Check running experiments that might affect ads
+tools/db_query.sh --table experiments --eq status:running --eq channel:ads
+```
+
+### `tools/db_insert.sh` — Log Campaigns & Decisions
+Log new campaigns and significant decisions.
+
+```bash
+# Log a new campaign
+tools/db_insert.sh --table campaigns --data '{"name":"Spring Tournament Promo","platform":"meta","goal":"demo_bookings","audience":"hockey directors 25-55","budget_cents":5000,"status":"draft"}'
+
+# Log a decision
+tools/db_insert.sh --table agent_decisions --data '{"agent":"ads","decision":"Launched spring tournament campaign on Meta","reasoning":"Tournament season starting, high intent audience","context":{"campaign_id":5,"budget_cents":5000,"targeting":"directors_25_55"}}'
+```
+
+### Memory Protocol
+At the start of every task:
+1. Query your recent decisions: `tools/db_query.sh --table agent_decisions --eq agent:ads --limit 10`
+2. Query active campaigns: `tools/db_query.sh --table campaigns --eq status:active`
+
+After significant actions:
+- Log new campaigns to the `campaigns` table
+- Log session summaries to `agent_decisions` with context about campaign performance
+- Use campaign history to track what's been tested and what's performing
+
+---
+
 ## Slack Identity
 
 - **Display Name:** Jordan (Ads)
