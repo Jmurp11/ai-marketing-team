@@ -3,7 +3,7 @@
 // Uses Socket Mode (no public URL needed)
 
 const { App } = require("@slack/bolt");
-const { execFile } = require("child_process");
+const { execFile, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -208,28 +208,42 @@ function callClaude(systemPrompt, userMessage, agentKey) {
   return new Promise((resolve, reject) => {
     const allowedTools = AGENT_ALLOWED_TOOLS[agentKey] || [];
 
+    // Prepend system prompt to the user message to avoid arg parsing issues
+    // with special characters (---, #, *, etc.) in markdown system prompts
+    const combinedPrompt = `You are acting as the following agent. Follow these instructions:\n\n${systemPrompt}\n\n---\n\nUser message: ${userMessage}`;
+
     const args = [
-      "--output-format",
-      "text",
-      "--system-prompt",
-      systemPrompt,
+      "--output-format", "text",
       "--no-session-persistence",
       "--dangerously-skip-permissions",
+      "--max-turns", "1",
     ];
 
     for (const tool of allowedTools) {
       args.push("--allowedTools", tool);
     }
 
-    args.push("-p", userMessage);
+    args.push("-p", combinedPrompt);
 
-    console.log(`[Claude] Calling: claude ${args.join(" ").slice(0, 200)}...`);
+    console.log(`[Claude] Calling agent=${agentKey}, prompt=${userMessage.slice(0, 80)}`);
 
-    execFile("claude", args, { cwd: PROJECT_ROOT, timeout: 300_000 }, (err, stdout, stderr) => {
+    const child = spawn("claude", args, {
+      cwd: PROJECT_ROOT,
+      timeout: 300_000,
+      env: { ...process.env },
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (data) => { stdout += data.toString(); });
+    child.stderr.on("data", (data) => { stderr += data.toString(); });
+
+    child.on("close", (code) => {
       if (stderr) console.error(`[Claude stderr] ${stderr.slice(0, 500)}`);
-      if (err) {
-        console.error(`[Claude error] ${err.message}`);
-        reject(new Error(stderr || err.message));
+      if (code !== 0) {
+        console.error(`[Claude] Exited with code ${code}`);
+        reject(new Error(stderr || `Claude exited with code ${code}`));
         return;
       }
       const response = stdout.trim();
@@ -237,7 +251,13 @@ function callClaude(systemPrompt, userMessage, agentKey) {
         reject(new Error("Empty response from Claude"));
         return;
       }
+      console.log(`[Claude] Response received (${response.length} chars)`);
       resolve(response);
+    });
+
+    child.on("error", (err) => {
+      console.error(`[Claude spawn error] ${err.message}`);
+      reject(err);
     });
   });
 }
