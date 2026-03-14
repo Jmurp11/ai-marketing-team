@@ -208,22 +208,17 @@ function callClaude(systemPrompt, userMessage, agentKey) {
   return new Promise((resolve, reject) => {
     const allowedTools = AGENT_ALLOWED_TOOLS[agentKey] || [];
 
-    // Prepend system prompt to the user message to avoid arg parsing issues
-    // with special characters (---, #, *, etc.) in markdown system prompts
-    const combinedPrompt = `You are acting as the following agent. Follow these instructions:\n\n${systemPrompt}\n\n---\n\nUser message: ${userMessage}`;
-
     const args = [
+      "-p",
       "--output-format", "text",
       "--no-session-persistence",
       "--dangerously-skip-permissions",
-      "--max-turns", "1",
+      "--append-system-prompt", systemPrompt,
     ];
 
     for (const tool of allowedTools) {
       args.push("--allowedTools", tool);
     }
-
-    args.push("-p", combinedPrompt);
 
     console.log(`[Claude] Calling agent=${agentKey}, prompt=${userMessage.slice(0, 80)}`);
 
@@ -232,6 +227,10 @@ function callClaude(systemPrompt, userMessage, agentKey) {
       timeout: 300_000,
       env: { ...process.env },
     });
+
+    // Send user message via stdin
+    child.stdin.write(userMessage);
+    child.stdin.end();
 
     let stdout = "";
     let stderr = "";
