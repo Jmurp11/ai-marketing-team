@@ -214,6 +214,7 @@ function callClaude(systemPrompt, userMessage, agentKey) {
       "--system-prompt",
       systemPrompt,
       "--no-session-persistence",
+      "--dangerously-skip-permissions",
     ];
 
     for (const tool of allowedTools) {
@@ -222,8 +223,12 @@ function callClaude(systemPrompt, userMessage, agentKey) {
 
     args.push("-p", userMessage);
 
+    console.log(`[Claude] Calling: claude ${args.join(" ").slice(0, 200)}...`);
+
     execFile("claude", args, { cwd: PROJECT_ROOT, timeout: 300_000 }, (err, stdout, stderr) => {
+      if (stderr) console.error(`[Claude stderr] ${stderr.slice(0, 500)}`);
       if (err) {
+        console.error(`[Claude error] ${err.message}`);
         reject(new Error(stderr || err.message));
         return;
       }
