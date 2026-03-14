@@ -56,6 +56,27 @@ const app = new App({
 // Cache bot user ID so we can ignore our own messages
 let botUserId = null;
 
+// In-memory conversation history per channel (last N exchanges)
+const MAX_HISTORY = 10;
+const channelHistory = {}; // channelId -> [{ role: "user"|"agent", name, text }]
+
+function addToHistory(channelId, role, name, text) {
+  if (!channelHistory[channelId]) channelHistory[channelId] = [];
+  channelHistory[channelId].push({ role, name, text });
+  if (channelHistory[channelId].length > MAX_HISTORY) {
+    channelHistory[channelId].shift();
+  }
+}
+
+function formatHistory(channelId) {
+  const history = channelHistory[channelId];
+  if (!history || history.length === 0) return "";
+  const lines = history.map((h) =>
+    h.role === "user" ? `User (${h.name}): ${h.text}` : `${h.name}: ${h.text}`
+  );
+  return `\n\n## Recent Conversation\n${lines.join("\n\n")}`;
+}
+
 // ── Message Handler ─────────────────────────────────────────────────────────
 
 app.message(async ({ message, say, client }) => {
@@ -99,6 +120,9 @@ app.message(async ({ message, say, client }) => {
 
   const systemPrompt = fs.readFileSync(promptFile, "utf-8");
 
+  // Record user message in history
+  addToHistory(message.channel, "user", message.user, message.text);
+
   console.log(
     `[${new Date().toISOString()}] #${channelName} → ${agentConfig.display_name}: "${message.text.slice(0, 80)}..."`
   );
@@ -110,8 +134,14 @@ app.message(async ({ message, say, client }) => {
     icon_url: agentConfig.icon_url,
   });
 
+  // Build prompt with conversation history
+  const history = formatHistory(message.channel);
+  const fullPrompt = history
+    ? `${message.text}\n\n---\n\nFor context, here is the recent conversation in this channel:${history}`
+    : message.text;
+
   try {
-    const response = await callClaude(systemPrompt, message.text, agentKey);
+    const response = await callClaude(systemPrompt, fullPrompt, agentKey);
 
     // Delete thinking message and post real response
     try {
@@ -122,6 +152,9 @@ app.message(async ({ message, say, client }) => {
     } catch {
       // OK if delete fails (permissions), response still posts
     }
+
+    // Record agent response in history
+    addToHistory(message.channel, "agent", agentConfig.display_name, response);
 
     // Split long responses (Slack limit is 4000 chars per message)
     const chunks = splitMessage(response, 3900);
